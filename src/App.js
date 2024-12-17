@@ -1,5 +1,12 @@
+import Movies from "./compos/Movies";
 function App() {
-  return <h1>Hello world</h1>;
+  return (
+    <>
+      <main className="container my-2">
+        <Movies />
+      </main>
+    </>
+  );
 }
 
 export default App;
