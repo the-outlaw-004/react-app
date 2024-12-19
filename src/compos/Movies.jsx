@@ -1,13 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { getMovies } from "../services/fakeMovieService";
-import Like from "./common/Like";
 import Pagination from "./common/Pagination";
 import { paginate } from "../utils/paginate";
+import { getGenres } from "../services/fakeGenreService";
+import ListGroup from "./common/ListGroup";
+import MovieTable from "./MovieTable";
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
   const [pageSize, setPageSize] = useState(4);
   const [currentPage, setCurrentPage] = useState(1);
+  const [genres, setGenres] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState("all");
+  const [sortColumn, setSortColumn] = useState({
+    orderBy: "title",
+    order: "asc",
+  });
+
+  useEffect(() => {
+    async function fetchGenres() {
+      const data = await getGenres();
+      setGenres(data);
+    }
+    fetchGenres();
+  }, []);
 
   useEffect(() => {
     function fetchMovies() {
@@ -43,77 +59,91 @@ const Movies = () => {
     );
   };
 
-  const labels = ["id", "title", "genre", "numberInStock", "dailyRentalRate"];
+  const handleGenreSelection = (genre) => {
+    setSelectedGenre(genre);
+    setCurrentPage(1);
+  };
 
-  const paginatedMovies = paginate(movies, currentPage, pageSize);
+  const handleSort = (object) => {
+    setSortColumn(object);
+  };
+
+  const getPageData = () => {
+    let filterMovies = movies;
+    if (selectedGenre !== "all") {
+      filterMovies = filterMovies.filter(
+        (movie) => movie.genre.name === selectedGenre.name
+      );
+    }
+
+    filterMovies.sort((a, b) => {
+      if (["numberInStock", "dailyRentalRate"].includes(sortColumn.orderBy)) {
+        if (sortColumn.order === "desc") {
+          return -(a[sortColumn.orderBy] - b[sortColumn.orderBy]);
+        } else {
+          return a[sortColumn.orderBy] - b[sortColumn.orderBy];
+        }
+      } else {
+        let aValue = a[sortColumn.orderBy];
+        let bValue = b[sortColumn.orderBy];
+
+        if (sortColumn?.orderBy?.includes(".")) {
+          const genreAndName = sortColumn.orderBy.split(".");
+          aValue = a[genreAndName[0]][genreAndName[1]];
+          bValue = b[genreAndName[0]][genreAndName[1]];
+        }
+
+        if (sortColumn.order === "desc") {
+          return aValue?.toUpperCase() > bValue?.toUpperCase() ? 1 : -1;
+        } else {
+          return aValue?.toUpperCase() < bValue?.toUpperCase() ? 1 : -1;
+        }
+      }
+    });
+
+    let paginatedMovies = paginate(filterMovies, currentPage, pageSize);
+    return { totalCount: filterMovies.length, data: paginatedMovies };
+  };
+
+  const { totalCount, data } = getPageData();
 
   return (
-    <div className="">
-      {movies.length > 0 ? (
-        <p>
-          Showing
-          {movies.length > 1
-            ? " " + movies.length + " movies "
-            : " " + movies.length + " movie "}
-          in the Database
-        </p>
-      ) : (
-        <p>There are no movies in the Database</p>
-      )}
-      {movies.length > 0 && (
-        <table className="table">
-          <thead>
-            <tr>
-              {labels.length > 0 &&
-                labels.map((key) => (
-                  <th
-                    className="text-capitalize text-center border-b-3"
-                    key={key}
-                  >
-                    {key}
-                  </th>
-                ))}
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedMovies.length > 0 &&
-              paginatedMovies.map((movie) => (
-                <tr key={movie._id}>
-                  <td className="text-center">{movie._id}</td>
-                  <td className="text-center">{movie.title}</td>
-                  <td className="text-center">{movie.genre.name}</td>
-                  <td className="text-center">{movie.numberInStock}</td>
-                  <td className="text-center">{movie.dailyRentalRate}</td>
-                  <td className="text-center">
-                    <Like movie={movie} onLike={() => handleLike(movie._id)} />
-                  </td>
-                  <td className="text-center">
-                    <button
-                      className="btn btn-danger p-2 rounded"
-                      onClick={() => handleDelete(movie._id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                  {/* <td className="text-center">
-                  {
-                    //   readableDate(movie.publishDate) ||
-                    readableDate(movies[0].publishDate)
-                  }
-                </td> */}
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      )}
-      <Pagination
-        itemsCount={movies.length}
-        pageSize={pageSize}
-        onPageChange={handlePageChange}
-        currentPage={currentPage}
-      />
+    <div className="row py-2">
+      <div className="col-2">
+        <ListGroup
+          genres={genres}
+          onGenreSelect={handleGenreSelection}
+          selectedGenre={selectedGenre}
+        />
+      </div>
+      <div className="col">
+        {totalCount > 0 ? (
+          <p>
+            Showing
+            {totalCount > 1
+              ? " " + totalCount + " movies "
+              : " " + totalCount + " movie "}
+            in the Database
+          </p>
+        ) : (
+          <p>There are no movies in the Database</p>
+        )}
+        {movies.length > 0 && (
+          <MovieTable
+            sortColumn={sortColumn}
+            onSort={handleSort}
+            movies={data}
+            onLike={handleLike}
+            onDelete={handleDelete}
+          />
+        )}
+        <Pagination
+          itemsCount={totalCount}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          currentPage={currentPage}
+        />
+      </div>
     </div>
   );
 };
