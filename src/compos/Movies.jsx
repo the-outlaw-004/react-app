@@ -5,9 +5,10 @@ import { paginate } from "../utils/paginate";
 import { getGenres } from "../services/fakeGenreService";
 import ListGroup from "./common/ListGroup";
 import MovieTable from "./MovieTable";
+import { Link } from "react-router-dom";
 
-const Movies = () => {
-  const [movies, setMovies] = useState([]);
+const Movies = ({ movies, onDelete, onLike }) => {
+  // const [movies, setMovies] = useState([]);
   const [pageSize, setPageSize] = useState(4);
   const [currentPage, setCurrentPage] = useState(1);
   const [genres, setGenres] = useState([]);
@@ -25,13 +26,13 @@ const Movies = () => {
     fetchGenres();
   }, []);
 
-  useEffect(() => {
-    function fetchMovies() {
-      const fetchedMovies = getMovies();
-      setMovies(fetchedMovies);
-    }
-    fetchMovies();
-  }, []);
+  // useEffect(() => {
+  //   function fetchMovies() {
+  //     const fetchedMovies = getMovies();
+  //     setMovies(fetchedMovies);
+  //   }
+  //   fetchMovies();
+  // }, []);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -46,18 +47,6 @@ const Movies = () => {
   //       day: "numeric",
   //     });
   //   };
-
-  const handleDelete = (id) => {
-    setMovies(movies.filter((movie) => movie._id !== id));
-  };
-
-  const handleLike = (id) => {
-    setMovies(
-      movies.map((m) => {
-        return m._id === id ? { ...m, isLiked: !m.isLiked } : m;
-      })
-    );
-  };
 
   const handleGenreSelection = (genre) => {
     setSelectedGenre(genre);
@@ -117,6 +106,10 @@ const Movies = () => {
         />
       </div>
       <div className="col">
+        {/* <button className="btn btn-primary mb-2">New Movie</button> */}
+        <Link to="/movie/new" className="btn btn-primary mb-2">
+          New Movie
+        </Link>
         {totalCount > 0 ? (
           <p>
             Showing
@@ -133,8 +126,8 @@ const Movies = () => {
             sortColumn={sortColumn}
             onSort={handleSort}
             movies={data}
-            onLike={handleLike}
-            onDelete={handleDelete}
+            onLike={onLike}
+            onDelete={onDelete}
           />
         )}
         <Pagination
