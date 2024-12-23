@@ -6,12 +6,14 @@ import { getGenres } from "../services/fakeGenreService";
 import ListGroup from "./common/ListGroup";
 import MovieTable from "./MovieTable";
 import { Link } from "react-router-dom";
+import SearchBox from "./common/SearchBox";
 
 const Movies = ({ movies, onDelete, onLike }) => {
   // const [movies, setMovies] = useState([]);
   const [pageSize, setPageSize] = useState(4);
   const [currentPage, setCurrentPage] = useState(1);
   const [genres, setGenres] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [sortColumn, setSortColumn] = useState({
     orderBy: "title",
@@ -26,6 +28,12 @@ const Movies = ({ movies, onDelete, onLike }) => {
     fetchGenres();
   }, []);
 
+  const handleSearch = (search) => {
+    console.log(search);
+    setSearchQuery(search);
+    setSelectedGenre("all");
+    setCurrentPage(1);
+  };
   // useEffect(() => {
   //   function fetchMovies() {
   //     const fetchedMovies = getMovies();
@@ -50,6 +58,7 @@ const Movies = ({ movies, onDelete, onLike }) => {
 
   const handleGenreSelection = (genre) => {
     setSelectedGenre(genre);
+    setSearchQuery("");
     setCurrentPage(1);
   };
 
@@ -59,6 +68,10 @@ const Movies = ({ movies, onDelete, onLike }) => {
 
   const getPageData = () => {
     let filterMovies = movies;
+    if (searchQuery)
+      filterMovies = movies.filter((m) =>
+        m.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     if (selectedGenre !== "all") {
       filterMovies = filterMovies.filter(
         (movie) => movie.genre.name === selectedGenre.name
@@ -121,6 +134,7 @@ const Movies = ({ movies, onDelete, onLike }) => {
         ) : (
           <p>There are no movies in the Database</p>
         )}
+        <SearchBox value={searchQuery} onChange={handleSearch} />
         {movies.length > 0 && (
           <MovieTable
             sortColumn={sortColumn}
