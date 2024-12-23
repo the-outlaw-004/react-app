@@ -35,7 +35,7 @@ const MovieForm = ({ movies, genres, onSave }) => {
     if (params.id === "new") {
       data = {
         ...data,
-        _id: Date.now(),
+        _id: String(Date.now()),
         genre: genres.find((g) => g._id === data.genre),
       };
       onSave([...movies, data]);

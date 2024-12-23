@@ -1,6 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Joi from "joi-browser";
 import { useForm } from "./common/useForm";
+
+const initialData = {
+  username: "",
+  password: "",
+};
 
 const LoginForm = () => {
   const schema = {
@@ -8,15 +13,14 @@ const LoginForm = () => {
     password: Joi.string().required().label("Password"),
   };
 
-  const doSubmit = (newData) => {};
+  const doSubmit = (newData) => {
+    console.log(newData);
+  };
 
   const { handleSubmit, renderButton, renderInput } = useForm(
     schema,
     doSubmit,
-    {
-      username: "",
-      password: "",
-    }
+    initialData
   );
 
   return (

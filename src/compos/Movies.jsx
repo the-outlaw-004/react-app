@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { getMovies } from "../services/fakeMovieService";
 import Pagination from "./common/Pagination";
 import { paginate } from "../utils/paginate";
 import { getGenres } from "../services/fakeGenreService";
 import ListGroup from "./common/ListGroup";
 import MovieTable from "./MovieTable";
 import { Link } from "react-router-dom";
+import SearchBox from "./common/SearchBox";
 
 const Movies = ({ movies, onDelete, onLike }) => {
   // const [movies, setMovies] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [pageSize, setPageSize] = useState(4);
   const [currentPage, setCurrentPage] = useState(1);
   const [genres, setGenres] = useState([]);
@@ -50,6 +51,7 @@ const Movies = ({ movies, onDelete, onLike }) => {
 
   const handleGenreSelection = (genre) => {
     setSelectedGenre(genre);
+    setSearchQuery("");
     setCurrentPage(1);
   };
 
@@ -59,6 +61,10 @@ const Movies = ({ movies, onDelete, onLike }) => {
 
   const getPageData = () => {
     let filterMovies = movies;
+    if (searchQuery)
+      filterMovies = movies.filter((m) =>
+        m.title.toLowerCase().includes(searchQuery.toLocaleLowerCase())
+      );
     if (selectedGenre !== "all") {
       filterMovies = filterMovies.filter(
         (movie) => movie.genre.name === selectedGenre.name
@@ -94,6 +100,12 @@ const Movies = ({ movies, onDelete, onLike }) => {
     return { totalCount: filterMovies.length, data: paginatedMovies };
   };
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    setSelectedGenre("all");
+    setCurrentPage(1);
+  };
+
   const { totalCount, data } = getPageData();
 
   return (
@@ -121,6 +133,7 @@ const Movies = ({ movies, onDelete, onLike }) => {
         ) : (
           <p>There are no movies in the Database</p>
         )}
+        <SearchBox query={searchQuery} onChange={handleSearch} />
         {movies.length > 0 && (
           <MovieTable
             sortColumn={sortColumn}
