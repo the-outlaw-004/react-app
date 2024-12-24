@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { getMovies } from "../services/fakeMovieService";
 import Pagination from "./common/Pagination";
 import { paginate } from "../utils/paginate";
 import { getGenres } from "../services/fakeGenreService";
@@ -27,13 +26,6 @@ const Movies = ({ movies, onDelete, onLike }) => {
     }
     fetchGenres();
   }, []);
-
-  const handleSearch = (search) => {
-    console.log(search);
-    setSearchQuery(search);
-    setSelectedGenre("all");
-    setCurrentPage(1);
-  };
   // useEffect(() => {
   //   function fetchMovies() {
   //     const fetchedMovies = getMovies();
@@ -105,6 +97,12 @@ const Movies = ({ movies, onDelete, onLike }) => {
 
     let paginatedMovies = paginate(filterMovies, currentPage, pageSize);
     return { totalCount: filterMovies.length, data: paginatedMovies };
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    setSelectedGenre("all");
+    setCurrentPage(1);
   };
 
   const { totalCount, data } = getPageData();
