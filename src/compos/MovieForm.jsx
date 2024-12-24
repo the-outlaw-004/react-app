@@ -24,7 +24,7 @@ const MovieForm = ({ movies, genres, onSave }) => {
     numberInStock: "",
     dailyRentalRate: "",
   });
-  let options = genres.map((genre) => {
+  let options = genres?.map((genre) => {
     return {
       label: genre.name,
       value: genre._id,
@@ -41,11 +41,11 @@ const MovieForm = ({ movies, genres, onSave }) => {
   useEffect(() => {
     let movie;
     if (params.id !== "new") {
-      movie = movies && movies.find((m) => m._id == params.id);
+      movie = movies.length && movies.find((m) => m._id == params.id);
       if (movie) {
         setInitialData({ ...movie, genre: movie.genre._id });
       } else if (movies.length) navigate("/not-found");
-    } else setInitialData({ ...initialData, genre: genres[0]?._id });
+    } else setInitialData({ ...initialData, genre: genres && genres[0]?._id });
   }, [params.id, movies, genres]);
 
   const { handleSubmit, renderInput, renderButton, renderSelect } = useForm(

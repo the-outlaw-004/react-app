@@ -10,7 +10,7 @@ const ListGroup = ({ genres, onGenreSelect, selectedGenre }) => {
       >
         <button className="page-link">All Genres</button>
       </li>
-      {genres.length > 0 &&
+      {genres?.length > 0 &&
         genres.map((genre) => (
           <li
             key={genre._id}

@@ -68,7 +68,7 @@ const Movies = ({ movies, genres, onDelete, onLike }) => {
     });
 
     let paginatedMovies = filterMovies && paginate(filterMovies, currentPage, pageSize);
-    return { totalCount: filterMovies.length, data: paginatedMovies };
+    return { totalCount: filterMovies?.length, data: paginatedMovies };
   };
 
   const handleSearch = (query) => {
@@ -105,7 +105,7 @@ const Movies = ({ movies, genres, onDelete, onLike }) => {
           <p>There are no movies in the Database</p>
         )}
         <SearchBox value={searchQuery} onChange={handleSearch} />
-        {movies.length > 0 && (
+        {movies?.length > 0 && (
           <MovieTable
             sortColumn={sortColumn}
             onSort={handleSort}

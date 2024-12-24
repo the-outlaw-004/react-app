@@ -11,6 +11,13 @@ import { useEffect, useState } from "react";
 import httpService from "./services/httpService";
 import { toast, ToastContainer } from "react-toastify";
 import logService from "./services/logService";
+import {
+  deleteMovie,
+  getMovies,
+  saveMovie,
+  updateMovie,
+} from "./services/movieService";
+import { getGenres } from "./services/genreService";
 
 logService.init();
 const movieEndpoint = process.env.REACT_APP_API_BASE_URL + "movies/";
@@ -21,7 +28,8 @@ function App() {
   useEffect(() => {
     async function fetchMovies() {
       // const fetchedMovies = getMovies();
-      const result = await httpService.get(movieEndpoint);
+      // const result = await httpService.get(movieEndpoint);
+      const result = await getMovies();
       setMovies(result?.data);
     }
     fetchMovies();
@@ -30,9 +38,11 @@ function App() {
   useEffect(() => {
     async function fetchGenres() {
       // const fetchedGenres = getGenres();
-      const result = await httpService.get(
-        process.env.REACT_APP_API_BASE_URL + "genres"
-      );
+      // const result = await httpService.get(
+      //   process.env.REACT_APP_API_BASE_URL + "genres"
+      // );
+      const result = await getGenres();
+
       setGenres(result?.data);
     }
     fetchGenres();
@@ -42,10 +52,11 @@ function App() {
     const originalMovies = [...movies];
     setMovies(movies.filter((movie) => movie._id !== id));
     try {
-      await httpService.delete(movieEndpoint + id);
+      // await httpService.delete(movieEndpoint + id);
+      await deleteMovie(id);
     } catch (ex) {
       if (ex.response && ex.response.status === 404) {
-        console.log(ex.message);
+        console.log(`Movie with ${id} not found`);
       }
       setMovies(originalMovies);
     }
@@ -67,13 +78,14 @@ function App() {
     try {
       await httpService.put(movieEndpoint + id, movie);
     } catch (ex) {
-      if (ex.response && ex.response.status === 400) toast.error(ex.message);
+      if (ex.response && ex.response.status === 400) {
+        toast.error(ex.message);
+      }
       setMovies(movies.map((m) => (m._id === id ? originalMovie : m)));
     }
   };
 
   const save = async (data, id = null) => {
-    toast("toast it");
     const originalMovies = [...movies];
     if (id === "new") {
       data = {
@@ -83,6 +95,15 @@ function App() {
         genre: genres.find((g) => g._id === data.genre),
       };
       setMovies([{ ...data }, ...movies]);
+      try {
+        const result = await saveMovie(data);
+      } catch (ex) {
+        console.log(ex);
+        const expectedErrors =
+          ex.response && ex.response.status >= 400 && ex.response.status < 500;
+        if (expectedErrors) toast.error(ex.message);
+        setMovies(originalMovies);
+      }
     } else {
       data = {
         ...data,
@@ -90,15 +111,15 @@ function App() {
         genre: genres.find((g) => g._id === data.genre),
       };
       setMovies(movies.map((m) => (m._id === data._id ? data : m)));
-    }
-    try {
-      const result = await httpService.post(movieEndpoint, data);
-    } catch (ex) {
-      console.log(ex);
-      const expectedErrors =
-        ex.response && ex.response.status >= 400 && ex.response.status < 500;
-      if (expectedErrors) toast.error(ex.message);
-      setMovies(originalMovies);
+      try {
+        const result = await updateMovie(data);
+      } catch (ex) {
+        console.log(ex);
+        const expectedErrors =
+          ex.response && ex.response.status >= 400 && ex.response.status < 500;
+        if (expectedErrors) toast.error(ex.message);
+        setMovies(originalMovies);
+      }
     }
   };
 
