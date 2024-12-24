@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Pagination from "./common/Pagination";
 import { paginate } from "../utils/paginate";
-import { getGenres } from "../services/fakeGenreService";
 import ListGroup from "./common/ListGroup";
 import MovieTable from "./MovieTable";
 import { Link } from "react-router-dom";
 import SearchBox from "./common/SearchBox";
 
-const Movies = ({ movies, onDelete, onLike }) => {
-  // const [movies, setMovies] = useState([]);
+const Movies = ({ movies, genres, onDelete, onLike }) => {
   const [pageSize, setPageSize] = useState(4);
   const [currentPage, setCurrentPage] = useState(1);
-  const [genres, setGenres] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [sortColumn, setSortColumn] = useState({
@@ -19,34 +16,9 @@ const Movies = ({ movies, onDelete, onLike }) => {
     order: "asc",
   });
 
-  useEffect(() => {
-    async function fetchGenres() {
-      const data = await getGenres();
-      setGenres(data);
-    }
-    fetchGenres();
-  }, []);
-  // useEffect(() => {
-  //   function fetchMovies() {
-  //     const fetchedMovies = getMovies();
-  //     setMovies(fetchedMovies);
-  //   }
-  //   fetchMovies();
-  // }, []);
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
-
-  //   const readableDate = (dateString) => {
-  //     const date = new Date(dateString);
-
-  //     return date.toLocaleString("en-US", {
-  //       year: "numeric",
-  //       month: "long",
-  //       day: "numeric",
-  //     });
-  //   };
 
   const handleGenreSelection = (genre) => {
     setSelectedGenre(genre);
@@ -61,16 +33,16 @@ const Movies = ({ movies, onDelete, onLike }) => {
   const getPageData = () => {
     let filterMovies = movies;
     if (searchQuery)
-      filterMovies = movies.filter((m) =>
-        m.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    if (selectedGenre !== "all") {
-      filterMovies = filterMovies.filter(
-        (movie) => movie.genre.name === selectedGenre.name
-      );
-    }
+      filterMovies = movies?.filter((m) =>
+    m.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  if (selectedGenre !== "all") {
+    filterMovies = filterMovies?.filter(
+      (movie) => movie.genre.name === selectedGenre.name
+    );
+  }
 
-    filterMovies.sort((a, b) => {
+    filterMovies?.sort((a, b) => {
       if (["numberInStock", "dailyRentalRate"].includes(sortColumn.orderBy)) {
         if (sortColumn.order === "desc") {
           return -(a[sortColumn.orderBy] - b[sortColumn.orderBy]);
@@ -95,7 +67,7 @@ const Movies = ({ movies, onDelete, onLike }) => {
       }
     });
 
-    let paginatedMovies = paginate(filterMovies, currentPage, pageSize);
+    let paginatedMovies = filterMovies && paginate(filterMovies, currentPage, pageSize);
     return { totalCount: filterMovies.length, data: paginatedMovies };
   };
 

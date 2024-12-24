@@ -9,7 +9,9 @@ const TableBody = ({ data, columns }) => {
           <tr key={item._id}>
             {columns.map((column) => {
               if (column.content)
-                return <td key={item._id + column.key}>{column.content(item)}</td>;
+                return (
+                  <td key={item._id + column.key}>{column.content(item)}</td>
+                );
               if (column?.path && column?.path?.includes(".")) {
                 const genreAndName = column.path.split(".");
                 let genre = genreAndName[0];
@@ -36,7 +38,7 @@ const TableBody = ({ data, columns }) => {
                         {item[column.path]}
                       </Link>
                     ) : ( */}
-                      {item[column.path]}
+                    {item[column.path]}
                     {/* )} */}
                   </td>
                 );
