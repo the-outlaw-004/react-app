@@ -33,27 +33,15 @@ const MovieForm = ({ movies, genres, onSave }) => {
 
   const doSubmit = (data) => {
     if (params.id === "new") {
-      data = {
-        ...data,
-        _id: String(Date.now()),
-        genre: genres.find((g) => g._id === data.genre),
-      };
-      onSave([...movies, data]);
+      onSave(data, "new");
     } else {
-      data = {
-        ...data,
-        genre: genres.find((g) => g._id === data.genre),
-      };
-      onSave(movies.map((m) => (m._id === data._id ? data : m)));
+      onSave(data);
     }
   };
   useEffect(() => {
     let movie;
     if (params.id !== "new") {
-      console.log(movies);
       movie = movies && movies.find((m) => m._id == params.id);
-      console.log(movie);
-      // console.log(typeof movie._id)
       if (movie) {
         setInitialData({ ...movie, genre: movie.genre._id });
       } else if (movies.length) navigate("/not-found");
