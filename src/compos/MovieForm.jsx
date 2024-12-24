@@ -50,7 +50,10 @@ const MovieForm = ({ movies, genres, onSave }) => {
   useEffect(() => {
     let movie;
     if (params.id !== "new") {
-      movie = movies.find((m) => m._id === params.id);
+      console.log(movies);
+      movie = movies && movies.find((m) => m._id == params.id);
+      console.log(movie);
+      // console.log(typeof movie._id)
       if (movie) {
         setInitialData({ ...movie, genre: movie.genre._id });
       } else if (movies.length) navigate("/not-found");

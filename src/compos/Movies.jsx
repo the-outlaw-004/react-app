@@ -9,10 +9,10 @@ import SearchBox from "./common/SearchBox";
 
 const Movies = ({ movies, onDelete, onLike }) => {
   // const [movies, setMovies] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [pageSize, setPageSize] = useState(4);
   const [currentPage, setCurrentPage] = useState(1);
   const [genres, setGenres] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [sortColumn, setSortColumn] = useState({
     orderBy: "title",
@@ -26,7 +26,6 @@ const Movies = ({ movies, onDelete, onLike }) => {
     }
     fetchGenres();
   }, []);
-
   // useEffect(() => {
   //   function fetchMovies() {
   //     const fetchedMovies = getMovies();
@@ -63,7 +62,7 @@ const Movies = ({ movies, onDelete, onLike }) => {
     let filterMovies = movies;
     if (searchQuery)
       filterMovies = movies.filter((m) =>
-        m.title.toLowerCase().includes(searchQuery.toLocaleLowerCase())
+        m.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
     if (selectedGenre !== "all") {
       filterMovies = filterMovies.filter(
@@ -133,7 +132,7 @@ const Movies = ({ movies, onDelete, onLike }) => {
         ) : (
           <p>There are no movies in the Database</p>
         )}
-        <SearchBox query={searchQuery} onChange={handleSearch} />
+        <SearchBox value={searchQuery} onChange={handleSearch} />
         {movies.length > 0 && (
           <MovieTable
             sortColumn={sortColumn}
