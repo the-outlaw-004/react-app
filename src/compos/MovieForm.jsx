@@ -31,7 +31,7 @@ const MovieForm = ({ movies, genres, onSave }) => {
     };
   });
 
-  const doSubmit = (data) => {
+  const doSubmit = (data, setError) => {
     if (params.id === "new") {
       onSave(data, "new");
     } else {
@@ -39,13 +39,17 @@ const MovieForm = ({ movies, genres, onSave }) => {
     }
   };
   useEffect(() => {
-    let movie;
-    if (params.id !== "new") {
-      movie = movies.length && movies.find((m) => m._id == params.id);
-      if (movie) {
-        setInitialData({ ...movie, genre: movie.genre._id });
-      } else if (movies.length) navigate("/not-found");
-    } else setInitialData({ ...initialData, genre: genres && genres[0]?._id });
+    function populateForm() {
+      let movie;
+      if (params.id !== "new") {
+        movie = movies.length && movies.find((m) => m._id === params.id);
+        if (movie) {
+          setInitialData({ ...movie, genre: movie.genre._id });
+        } else if (movies.length) navigate("/not-found");
+      } else
+        setInitialData({ ...initialData, genre: genres && genres[0]?._id });
+    }
+    populateForm();
   }, [params.id, movies, genres]);
 
   const { handleSubmit, renderInput, renderButton, renderSelect } = useForm(

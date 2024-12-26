@@ -2,8 +2,11 @@ import React from "react";
 import Like from "./common/Like";
 import Table from "./common/Table";
 import { Link } from "react-router-dom";
+import auth from "../services/authService";
 
 const MovieTable = ({ sortColumn, movies, onLike, onDelete, onSort }) => {
+  const user = auth.getCurrentUser();
+
   const columns = [
     { path: "_id", label: "ID" },
     {
@@ -24,7 +27,9 @@ const MovieTable = ({ sortColumn, movies, onLike, onDelete, onSort }) => {
         <Like movie={movie} onLike={() => onLike(movie._id)} />
       ),
     },
-    {
+  ];
+  if (user && user.isAdmin) {
+    columns.push({
       key: "Delete",
       content: (movie) => (
         <button
@@ -34,8 +39,9 @@ const MovieTable = ({ sortColumn, movies, onLike, onDelete, onSort }) => {
           Delete
         </button>
       ),
-    },
-  ];
+    });
+  }
+
   return (
     <Table
       sortColumn={sortColumn}

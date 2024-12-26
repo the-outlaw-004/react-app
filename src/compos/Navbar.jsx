@@ -1,13 +1,13 @@
 import React from "react";
-import {
-  NavLink,
-  //  useLocation
-} from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import auth from "../services/authService";
 
-const Navbar = () => {
-  // const location = useLocation();
-  // const pathName = location.pathname;
-
+const Navbar = ({ user, setUser }) => {
+  const handleLogout = () => {
+    auth.logout();
+    setUser(null);
+    // window.location = "/";
+  };
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
@@ -55,16 +55,34 @@ const Navbar = () => {
                 Rentals
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/login">
-                Login
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/register">
-                Register
-              </NavLink>
-            </li>
+            {!user && (
+              <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/login">
+                    Login
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/register">
+                    Register
+                  </NavLink>
+                </li>
+              </>
+            )}
+            {user && (
+              <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/profile">
+                    {user.name}
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/" onClick={handleLogout}>
+                    Logout
+                  </NavLink>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>
