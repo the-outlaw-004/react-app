@@ -6,7 +6,7 @@ import MovieTable from "./MovieTable";
 import { Link } from "react-router-dom";
 import SearchBox from "./common/SearchBox";
 
-const Movies = ({ movies, genres, onDelete, onLike }) => {
+const Movies = ({ movies, user, genres, onDelete, onLike }) => {
   const [pageSize, setPageSize] = useState(4);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,13 +34,13 @@ const Movies = ({ movies, genres, onDelete, onLike }) => {
     let filterMovies = movies;
     if (searchQuery)
       filterMovies = movies?.filter((m) =>
-    m.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  if (selectedGenre !== "all") {
-    filterMovies = filterMovies?.filter(
-      (movie) => movie.genre.name === selectedGenre.name
-    );
-  }
+        m.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    if (selectedGenre !== "all") {
+      filterMovies = filterMovies?.filter(
+        (movie) => movie.genre.name === selectedGenre.name
+      );
+    }
 
     filterMovies?.sort((a, b) => {
       if (["numberInStock", "dailyRentalRate"].includes(sortColumn.orderBy)) {
@@ -67,7 +67,8 @@ const Movies = ({ movies, genres, onDelete, onLike }) => {
       }
     });
 
-    let paginatedMovies = filterMovies && paginate(filterMovies, currentPage, pageSize);
+    let paginatedMovies =
+      filterMovies && paginate(filterMovies, currentPage, pageSize);
     return { totalCount: filterMovies?.length, data: paginatedMovies };
   };
 
@@ -90,9 +91,11 @@ const Movies = ({ movies, genres, onDelete, onLike }) => {
       </div>
       <div className="col">
         {/* <button className="btn btn-primary mb-2">New Movie</button> */}
-        <Link to="/movie/new" className="btn btn-primary mb-2">
-          New Movie
-        </Link>
+        {user && (
+          <Link to="/movie/new" className="btn btn-primary mb-2">
+            New Movie
+          </Link>
+        )}
         {totalCount > 0 ? (
           <p>
             Showing

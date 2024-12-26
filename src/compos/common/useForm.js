@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import Joi from "joi-browser";
 import Input from "./Input";
 import Select from "./Select";
-import { useNavigate } from "react-router-dom";
 
 export function useForm(schema, doSubmit, initialData) {
   const [data, setData] = useState(initialData);
   const [error, setError] = useState({});
-  const navigate = useNavigate();
 
   useEffect(() => {
     setData(initialData);
@@ -39,9 +37,8 @@ export function useForm(schema, doSubmit, initialData) {
 
     setError(errors);
     if (errors) return;
-    doSubmit(data);
+    doSubmit(data, setError);
     setData(initialData);
-    navigate("/");
   };
 
   const handleChange = (e) => {
